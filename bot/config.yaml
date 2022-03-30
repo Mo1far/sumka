@@ -1,0 +1,3 @@
+bot_token: ""
+admins: [ ]
+database_uri: postgresql+asyncpg://postgres:postgres@localhost:5432/sumka
