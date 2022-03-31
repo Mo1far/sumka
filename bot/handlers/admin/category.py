@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from sqlalchemy import or_
 
 from bot.core import dp
 from bot.db.decorators import session_decorator
@@ -22,8 +23,8 @@ async def category_towns_list(cq: types.CallbackQuery) -> None:
 @session_decorator(add_param=False)
 async def category_by_town_list(cq: types.CallbackQuery, callback_data: dict) -> None:
     town_id = int(callback_data["town_id"])
-    town = await Town.get(id=town_id)
-    categories = await Category.get_list(town_id=town_id, parent_category_id=None)
+    town = await Town.get(None, id=town_id)
+    categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id), parent_category_id=None)
     await cq.message.answer(f"Список категорій для {town.name}",
                             reply_markup=get_categories_for_town(categories, town_id))
     await cq.answer()
@@ -33,8 +34,8 @@ async def category_by_town_list(cq: types.CallbackQuery, callback_data: dict) ->
 @session_decorator(add_param=False)
 async def sub_category_by_town_list(cq: types.CallbackQuery, callback_data: dict) -> None:
     town_id = int(callback_data["town_id"])
-    parent_category = await Category.get(id=int(callback_data["category_id"]))
-    town = await Town.get(id=town_id)
+    parent_category = await Category.get(None, id=int(callback_data["category_id"]))
+    town = await Town.get(None, id=town_id)
     categories = await Category.get_list(town_id=town_id, parent_category_id=parent_category.id)
     await cq.message.answer(f"Список підкатегорій для {town.name} {parent_category.name}",
                             reply_markup=get_categories_for_town(categories, town_id))
@@ -90,16 +91,18 @@ async def create_category_desc_by_town(msg: types.Message, state: FSMContext):
 @dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.detail.value))
 @session_decorator(add_param=False)
 async def detail_category_by_town_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
-    category = await Category.get(int(callback_data["category_id"]))
+    category = await Category.get(None, id=int(callback_data["category_id"]))
+    town_id = int(callback_data["town_id"])
+
     await cq.message.answer(f"Назва - {category.name} \n\n"
-                            f"Опис - {category.description}", reply_markup=get_category_action_kb(category))
+                            f"Опис - {category.description}", reply_markup=get_category_action_kb(category, town_id=town_id))
     await cq.answer()
 
 
 @dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.delete.value))
 @session_decorator(add_param=False)
 async def category_delete_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
-    category = await Category.get(id=int(callback_data["category_id"]))
+    category = await Category.get(None, id=int(callback_data["category_id"]))
     await category.delete()
 
     await cq.answer("Видалено!")
@@ -121,7 +124,7 @@ async def category_edit_name_btn(cq: types.CallbackQuery, callback_data: dict, s
 @session_decorator(add_param=False)
 async def category_edit_name(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        category: Category = await Category.get(id=data["id"])
+        category: Category = await Category.get(None, id=data["id"])
         await category.update(name=msg.text)
 
     await state.finish()
@@ -144,7 +147,7 @@ async def category_edit_description_btn(cq: types.CallbackQuery, callback_data: 
 @session_decorator(add_param=False)
 async def category_edit_description(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        category: Category = await Category.get(id=data["id"])
+        category: Category = await Category.get(None, id=data["id"])
         await category.update(description=msg.text)
 
     await state.finish()

@@ -111,7 +111,7 @@ def get_categories_for_town(categories: List[Category], town_id: int):
     return kb
 
 
-def get_category_action_kb(category):
+def get_category_action_kb(category, town_id):
     kb = InlineKeyboardMarkup(row_width=2)
     kb.add(
         InlineKeyboardButton(f"Редагувати назву ✏️",
@@ -126,12 +126,12 @@ def get_category_action_kb(category):
         InlineKeyboardButton(f"Додати підкатегорію ✏️",
                              callback_data=category_callback.new(
                                  action=CategoryActionEnum.add_sub_category.value,
-                                 category_id=category.id, town_id=category.town_id)
+                                 category_id=category.id, town_id=category.town_id or town_id)
                              ),
         InlineKeyboardButton(f"Дивитися підкатегорії ✏️",
                              callback_data=category_callback.new(
                                  action=CategoryActionEnum.view_sub_category.value,
-                                 category_id=category.id, town_id=category.town_id)
+                                 category_id=category.id, town_id=category.town_id or town_id)
                              ),
         InlineKeyboardButton("Видалити ❌",
                              callback_data=category_callback.new(action=CategoryActionEnum.delete.value,

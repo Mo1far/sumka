@@ -20,10 +20,10 @@ def chunks(lst, n):
 @session_decorator()
 async def get_main_user_menu(town_id):
     main_user_menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    main_categories = await Category.get_list(or_(town_id == None, town_id == town_id), parent_category_id=None)
+    main_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id), parent_category_id=None)
     for category in main_categories:
         main_user_menu.insert(category.name)
-    main_user_menu.add(KeyboardButton("Змінити місце проживання"))
+    main_user_menu.insert(KeyboardButton("Змінити місце проживання"))
     return main_user_menu
 
 
