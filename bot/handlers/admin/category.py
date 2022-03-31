@@ -24,7 +24,8 @@ async def category_towns_list(cq: types.CallbackQuery) -> None:
 async def category_by_town_list(cq: types.CallbackQuery, callback_data: dict) -> None:
     town_id = int(callback_data["town_id"])
     town = await Town.get(None, id=town_id)
-    categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id), parent_category_id=None)
+    categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id),
+                                         parent_category_id=None)
     await cq.message.answer(f"Список категорій для {town.name}",
                             reply_markup=get_categories_for_town(categories, town_id))
     await cq.answer()
@@ -36,7 +37,8 @@ async def sub_category_by_town_list(cq: types.CallbackQuery, callback_data: dict
     town_id = int(callback_data["town_id"])
     parent_category = await Category.get(None, id=int(callback_data["category_id"]))
     town = await Town.get(None, id=town_id)
-    categories = await Category.get_list(town_id=town_id, parent_category_id=parent_category.id)
+    categories = await Category.get_list(or_(Category.town_id == town_id, Category.town_id == None),
+                                         parent_category_id=parent_category.id)
     await cq.message.answer(f"Список підкатегорій для {town.name} {parent_category.name}",
                             reply_markup=get_categories_for_town(categories, town_id))
     await cq.answer()
@@ -95,7 +97,8 @@ async def detail_category_by_town_btn(cq: types.CallbackQuery, callback_data: di
     town_id = int(callback_data["town_id"])
 
     await cq.message.answer(f"Назва - {category.name} \n\n"
-                            f"Опис - {category.description}", reply_markup=get_category_action_kb(category, town_id=town_id))
+                            f"Опис - {category.description}",
+                            reply_markup=get_category_action_kb(category, town_id=town_id))
     await cq.answer()
 
 
