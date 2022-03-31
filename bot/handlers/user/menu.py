@@ -36,6 +36,7 @@ async def menu(msg: types.Message, state: FSMContext):
     sub_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == user.town_id),
                                              parent_category_id=category.id)
     if not sub_categories:
+        await state.set_data({"previous_category_id": category.parent_category_id})
         return await msg.answer(category.description)
 
     kb = get_category_list_menu(sub_categories)
