@@ -48,3 +48,5 @@ async def menu(msg: types.Message, state: FSMContext):
 
     if category.parent_category_id:
         await state.set_data({"previous_category_id": category.parent_category_id})
+    else:
+        await state.set_data({})
