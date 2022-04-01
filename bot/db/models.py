@@ -34,6 +34,7 @@ class Category(Base):
 
     name = Column(String(100), nullable=False)
     description = Column(Text, default=False)
+    rating = Column(Integer, default=0)
 
     town_id = Column(Integer, ForeignKey("town.id"))
     parent_category_id = Column(Integer, ForeignKey("category.id"))

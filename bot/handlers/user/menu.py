@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from bot.core import dp, bot
+from bot.core import dp
 from bot.db.decorators import session_decorator
 from bot.db.models import Category, User
 from bot.kb.user import get_main_user_menu
@@ -25,8 +25,11 @@ async def menu(msg: types.Message, state: FSMContext):
     user = await User.get(msg.from_user.id)
     if msg.text == "Назад":
         data = await state.get_data()
-        previous_category_id = data.get("previous_category_id")
-        category: Category = await Category.get(previous_category_id) if previous_category_id else None
+        if previous_category_id := data.get("previous_category_id"):
+            category: Category = await Category.get(previous_category_id) if previous_category_id else None
+        else:
+            return await msg.answer("🕹Оберіть потрібний розділ", reply_markup=await get_main_user_menu(user.town_id))
+
     else:
         category: Category = await Category.get(None, or_(Category.town_id == None, Category.town_id == user.town_id),
                                                 name=msg.text)
@@ -36,11 +39,12 @@ async def menu(msg: types.Message, state: FSMContext):
     sub_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == user.town_id),
                                              parent_category_id=category.id)
     if not sub_categories:
-        parent_category = await Category.get(None, id=category.parent_category_id)
-        await state.set_data({"previous_category_id": parent_category.parent_category_id})
+        if parent_category := await Category.get(None, id=category.parent_category_id):
+            await state.set_data({"previous_category_id": parent_category.parent_category_id})
         return await msg.answer(category.description)
 
     kb = get_category_list_menu(sub_categories)
     await msg.answer("🕹Оберіть потрібний розділ", reply_markup=kb)
 
-    await state.set_data({"previous_category_id": category.parent_category_id})
+    if category.parent_category_id:
+        await state.set_data({"previous_category_id": category.parent_category_id})

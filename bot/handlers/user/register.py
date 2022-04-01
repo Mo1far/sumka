@@ -5,8 +5,8 @@ from aiogram.dispatcher.filters import Text
 from bot.core import dp
 from bot.db.decorators import session_decorator
 from bot.db.models import User, Town
-from bot.kb.user import main_user_menu, get_towns_list, get_main_user_menu
-from bot.states.user import UserRegisterState, UserMenuState
+from bot.kb.user import get_towns_list, get_main_user_menu
+from bot.states.user import UserRegisterState
 
 
 @dp.message_handler(commands=["start"], state="*")
