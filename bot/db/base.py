@@ -77,7 +77,7 @@ class Base(Model):
             }
             kwargs.update(where)
 
-        query = select(cls).filter_by(**kwargs).filter(*args)
+        query = select(cls).filter_by(**kwargs).filter(*args).order_by(cls.id)
         result = await current_session.execute(query)
         return result
 

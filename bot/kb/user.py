@@ -1,6 +1,6 @@
 from typing import List
 
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.callback_data import CallbackData
 from sqlalchemy import or_
 
@@ -20,7 +20,8 @@ def chunks(lst, n):
 @session_decorator()
 async def get_main_user_menu(town_id):
     main_user_menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    main_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id), parent_category_id=None)
+    main_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id),
+                                              parent_category_id=None)
     for category in main_categories:
         main_user_menu.insert(category.name)
     main_user_menu.insert(KeyboardButton("Змінити місце проживання"))
@@ -28,16 +29,7 @@ async def get_main_user_menu(town_id):
 
 
 def get_towns_list(towns: List[Town]) -> ReplyKeyboardMarkup:
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     for town in towns:
-        kb.add(KeyboardButton(town.name))
-    return kb
-
-
-def get_categories_info(categories: List[Category]):
-    kb = InlineKeyboardMarkup(row_width=1)
-    for category in categories:
-        kb.add(
-            InlineKeyboardButton(category.name, callback_data=category_info_callback.new(category_id=category.id)))
-
+        kb.insert(KeyboardButton(town.name))
     return kb

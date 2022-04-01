@@ -61,9 +61,10 @@ async def town_edit(msg: types.Message, state: FSMContext):
 
 
 @dp.callback_query_handler(IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.delete.value))
+@session_decorator(add_param=False)
 async def town_delete_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
     town_id = int(callback_data["town_id"])
-    town = await Town.get(id=town_id)
+    town = await Town.get(None, id=town_id)
     await town.delete()
 
     await cq.answer("Видалено!")

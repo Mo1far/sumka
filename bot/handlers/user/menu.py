@@ -11,9 +11,9 @@ from bot.kb.user import get_main_user_menu
 
 
 def get_category_list_menu(categories):
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     for category in categories:
-        kb.add(KeyboardButton(category.name))
+        kb.insert(KeyboardButton(category.name))
 
     kb.add(KeyboardButton("Назад"))
     return kb
@@ -36,7 +36,8 @@ async def menu(msg: types.Message, state: FSMContext):
     sub_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == user.town_id),
                                              parent_category_id=category.id)
     if not sub_categories:
-        await state.set_data({"previous_category_id": category.parent_category_id})
+        parent_category = await Category.get(None, id=category.parent_category_id)
+        await state.set_data({"previous_category_id": parent_category.parent_category_id})
         return await msg.answer(category.description)
 
     kb = get_category_list_menu(sub_categories)
