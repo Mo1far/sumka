@@ -15,7 +15,7 @@ def get_category_list_menu(categories):
     for category in categories:
         kb.insert(KeyboardButton(category.name))
 
-    kb.add(KeyboardButton("Назад"))
+    kb.add(KeyboardButton("Назад ↩"))
     return kb
 
 
@@ -23,7 +23,7 @@ def get_category_list_menu(categories):
 @session_decorator()
 async def menu(msg: types.Message, state: FSMContext):
     user = await User.get(msg.from_user.id)
-    if msg.text == "Назад":
+    if msg.text == "Назад ↩":
         data = await state.get_data()
         if previous_category_id := data.get("previous_category_id"):
             category: Category = await Category.get(previous_category_id) if previous_category_id else None

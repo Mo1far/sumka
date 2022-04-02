@@ -1,10 +1,5 @@
-from datetime import datetime
-
 from sqlalchemy import (
-    DECIMAL,
-    Boolean,
     Column,
-    DateTime,
     ForeignKey,
     Integer,
     String, Text,
@@ -18,6 +13,8 @@ class Town(Base):
     __tablename__ = "town"
 
     name = Column(String(100), nullable=False)
+    rating = Column(Integer, default=0)
+
     user = relationship("User")
 
 

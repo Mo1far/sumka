@@ -21,7 +21,7 @@ async def get_main_user_menu(current_session, town_id):
     #                                           parent_category_id=None)
     for category in main_categories:
         main_user_menu.insert(category.name)
-    main_user_menu.insert(KeyboardButton("Змінити місце проживання"))
+    main_user_menu.insert(KeyboardButton("Змінити місце проживання ⚙"))
     return main_user_menu
 
 

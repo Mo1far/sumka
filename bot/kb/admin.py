@@ -33,48 +33,6 @@ def get_towns_admin_kb(towns_list: List[Town]) -> InlineKeyboardMarkup:
     return kb
 
 
-# def get_global_category_admin_kb(categories: List[Town]) -> InlineKeyboardMarkup:
-#     kb = InlineKeyboardMarkup()
-#     for category in categories:
-#         kb.row(
-#             InlineKeyboardButton(f"{category.name} Огляд",
-#                                  callback_data=global_category_callback.new(
-#                                      action=GlobalCategoryActionEnum.detail.value,
-#                                      category_id=category.id)
-#                                  ),
-#             InlineKeyboardButton("Видалити ❌",
-#                                  callback_data=global_category_callback.new(
-#                                      action=GlobalCategoryActionEnum.delete.value,
-#                                      category_id=category.id)
-#                                  )
-#         )
-#     kb.add(InlineKeyboardButton("Додати глобальну категорію",
-#                                 callback_data=global_category_callback.new(action=GlobalCategoryActionEnum.create.value,
-#                                                                            category_id=0)))
-#     return kb
-
-
-# def get_global_category_action_kb(category: Category):
-#     kb = InlineKeyboardMarkup(row_width=2)
-#     kb.add(
-#         InlineKeyboardButton(f"Редагувати назву ✏️",
-#                              callback_data=global_category_callback.new(action=GlobalCategoryActionEnum.edit_name.value,
-#                                                                         category_id=category.id)
-#                              ),
-#         InlineKeyboardButton(f"Редагувати опис ✏️",
-#                              callback_data=global_category_callback.new(
-#                                  action=GlobalCategoryActionEnum.edit_description.value,
-#                                  category_id=category.id)
-#                              ),
-#         InlineKeyboardButton("Видалити ❌",
-#                              callback_data=global_category_callback.new(action=GlobalCategoryActionEnum.delete.value,
-#                                                                         category_id=category.id)
-#                              )
-#     )
-#
-#     return kb
-
-
 def get_town_for_categories(towns: List[Town]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup()
     for town in towns:
@@ -87,7 +45,8 @@ def get_town_for_categories(towns: List[Town]) -> InlineKeyboardMarkup:
     return kb
 
 
-def get_categories_for_town(categories: List[Category], town_id: int):
+def get_categories_for_town(categories: List[Category], town_id: int,
+                            parent_category_id: int = 0) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup()
     for category in categories:
         kb.row(
@@ -104,10 +63,16 @@ def get_categories_for_town(categories: List[Category], town_id: int):
                                      town_id=town_id)
                                  )
         )
-    kb.add(InlineKeyboardButton("Додати категорію",
-                                callback_data=category_callback.new(action=CategoryActionEnum.create.value,
-                                                                    category_id=0,
-                                                                    town_id=town_id)))
+    if parent_category_id:
+        kb.add(InlineKeyboardButton("Додати під категорію",
+                                    callback_data=category_callback.new(action=CategoryActionEnum.add_sub_category.value,
+                                                                        category_id=parent_category_id,
+                                                                        town_id=town_id)))
+    else:
+        kb.add(InlineKeyboardButton("Додати категорію",
+                                    callback_data=category_callback.new(action=CategoryActionEnum.create.value,
+                                                                        category_id=0,
+                                                                        town_id=town_id)))
     return kb
 
 

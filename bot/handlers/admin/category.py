@@ -40,7 +40,7 @@ async def sub_category_by_town_list(cq: types.CallbackQuery, callback_data: dict
     categories = await Category.get_list(or_(Category.town_id == town_id, Category.town_id == None),
                                          parent_category_id=parent_category.id)
     await cq.message.answer(f"Список підкатегорій для {town.name} {parent_category.name}",
-                            reply_markup=get_categories_for_town(categories, town_id))
+                            reply_markup=get_categories_for_town(categories, town_id, parent_category.id))
     await cq.answer()
 
 
