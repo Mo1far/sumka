@@ -22,7 +22,7 @@ class User(Base):
     __tablename__ = "user"
 
     name = Column(String(100), nullable=True)
-    user_name = Column(String(100), nullable=False)
+    user_name = Column(String(100), nullable=True)
     town_id = Column(Integer, ForeignKey("town.id"))
 
 
