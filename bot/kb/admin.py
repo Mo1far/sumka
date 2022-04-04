@@ -102,7 +102,7 @@ def get_category_action_kb(category, town_id):
         InlineKeyboardButton("Зробити глобальною",
                              callback_data=category_callback.new(
                                  action=CategoryActionEnum.make_global.value,
-                                 category_id=category.id, town_id=category.town_id
+                                 category_id=category.id, town_id=category.town_id or 0
                              )),
         InlineKeyboardButton("Видалити ❌",
                              callback_data=category_callback.new(action=CategoryActionEnum.delete.value,
