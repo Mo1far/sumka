@@ -155,3 +155,16 @@ async def category_edit_description(msg: types.Message, state: FSMContext):
 
     await state.finish()
     await msg.answer("Відредаговано!")
+
+
+@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.make_global.value))
+async def category_edit_description_btn(cq: types.CallbackQuery, callback_data: dict) -> None:
+    category: Category = await Category.get(None, id=int(callback_data["category_id"]))
+    parent_category: Category = await Category.get(None, parent_category_id=category.parent_category_id)
+
+    if parent_category.town_id is not None:
+        return await cq.answer("Ця категорія не може бути глобальною, оскільки батьківська прив'язана до міста")
+
+    await category.update(town_id=None)
+    await cq.answer("Відредаговано")
+    await cq.message.answer("Відредаговано")

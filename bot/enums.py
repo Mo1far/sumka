@@ -35,3 +35,4 @@ class CategoryActionEnum(AutoName):
     delete = enum.auto()
     add_sub_category = enum.auto()
     view_sub_category = enum.auto()
+    make_global = enum.auto()

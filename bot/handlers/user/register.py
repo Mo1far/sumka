@@ -29,7 +29,7 @@ async def start(current_session, msg: types.Message, state: FSMContext):
         await msg.answer("Оберіть ваше місце проживання", reply_markup=get_towns_list(towns))
 
 
-@dp.message_handler(Text(equals="Змінити місце проживання ⚙"))
+@dp.message_handler(Text(equals="⚙ Змінити місце проживання"))
 @session_decorator(add_param=True)
 async def change_user_town(current_session, msg: types.Message, state: FSMContext):
     query = select(Town).order_by(Town.rating.desc(), Town.id)

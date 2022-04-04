@@ -65,9 +65,10 @@ def get_categories_for_town(categories: List[Category], town_id: int,
         )
     if parent_category_id:
         kb.add(InlineKeyboardButton("Додати під категорію",
-                                    callback_data=category_callback.new(action=CategoryActionEnum.add_sub_category.value,
-                                                                        category_id=parent_category_id,
-                                                                        town_id=town_id)))
+                                    callback_data=category_callback.new(
+                                        action=CategoryActionEnum.add_sub_category.value,
+                                        category_id=parent_category_id,
+                                        town_id=town_id)))
     else:
         kb.add(InlineKeyboardButton("Додати категорію",
                                     callback_data=category_callback.new(action=CategoryActionEnum.create.value,
@@ -98,6 +99,11 @@ def get_category_action_kb(category, town_id):
                                  action=CategoryActionEnum.view_sub_category.value,
                                  category_id=category.id, town_id=category.town_id or town_id)
                              ),
+        InlineKeyboardButton("Зробити глобальною",
+                             callback_data=category_callback.new(
+                                 action=CategoryActionEnum.make_global.value,
+                                 category_id=category.id, town_id=category.town_id
+                             )),
         InlineKeyboardButton("Видалити ❌",
                              callback_data=category_callback.new(action=CategoryActionEnum.delete.value,
                                                                  category_id=category.id, town_id=0)
