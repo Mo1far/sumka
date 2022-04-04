@@ -1,3 +1,4 @@
 from . import base
-from . import town
 from . import category
+from . import mailing
+from . import town

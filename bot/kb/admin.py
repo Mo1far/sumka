@@ -7,14 +7,14 @@ from bot.db.models import Town, Category
 from bot.enums import TownActionEnum, GlobalCategoryActionEnum, CategoryActionEnum
 
 towns_callback = CallbackData("towns", "action", "town_id")
-global_category_callback = CallbackData("global_category", "action", "category_id")
 category_callback = CallbackData("category", "action", "category_id", "town_id")
+mailing_callback = CallbackData("mailing", "action", "town_id")
 
 admin_kb = InlineKeyboardMarkup().add(
     InlineKeyboardButton("Міста", callback_data=towns_callback.new(action=TownActionEnum.view.value, town_id=0)),
     InlineKeyboardButton("Категорії", callback_data=category_callback.new(action=CategoryActionEnum.view_towns.value,
-                                                                          category_id=0, town_id=0))
-)
+                                                                          category_id=0, town_id=0)),
+    InlineKeyboardButton("Розсилка", callback_data=mailing_callback.new(action="start", town_id=0)))
 
 
 def get_towns_admin_kb(towns_list: List[Town]) -> InlineKeyboardMarkup:
@@ -109,5 +109,16 @@ def get_category_action_kb(category, town_id):
                                                                  category_id=category.id, town_id=0)
                              )
     )
+
+    return kb
+
+
+def get_towns_for_mailing(towns: List[Town]) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("Глобально", callback_data=mailing_callback.new(town_id=0, action="assing_town")))
+
+    for town in towns:
+        kb.add(
+            InlineKeyboardButton(town.name, callback_data=mailing_callback.new(town_id=town.id, action="assing_town")))
 
     return kb

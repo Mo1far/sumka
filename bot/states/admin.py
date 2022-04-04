@@ -20,3 +20,8 @@ class CategoryState(StatesGroup):
 
     edit_name = State()
     edit_description = State()
+
+
+class MailingState(StatesGroup):
+    add_text = State()
+    add_town = State()
