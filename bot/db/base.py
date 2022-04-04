@@ -2,7 +2,7 @@ import contextvars
 import json
 from typing import Any, Dict, Iterator, Optional, Tuple, Union
 
-from sqlalchemy import Column, Integer, MetaData, inspect, select
+from sqlalchemy import Column, Integer, MetaData, inspect, select, BigInteger
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -51,7 +51,7 @@ async def db_connect(database_uri, echo: bool = False):
 # Bases
 class Base(Model):
     __abstract__ = True
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
 
     def to_dict(self) -> Dict[str, Any]:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
