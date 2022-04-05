@@ -41,7 +41,7 @@ async def menu(msg: types.Message, state: FSMContext):
     if not sub_categories:
         if parent_category := await Category.get(None, id=category.parent_category_id):
             await state.set_data({"previous_category_id": parent_category.parent_category_id})
-        return await msg.answer(category.description)
+        return await msg.answer(category.description, disable_web_page_preview=True)
 
     kb = get_category_list_menu(sub_categories)
     await msg.answer("🕹Оберіть потрібний розділ", reply_markup=kb)
