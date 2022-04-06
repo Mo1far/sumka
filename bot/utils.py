@@ -22,7 +22,7 @@ class Config(metaclass=SingLetonBaseClass):
     config = {}
 
     @classmethod
-    def load_config(cls, path: str) :
+    def load_config(cls, path: str):
         root_dir = pathlib.Path(__file__).parent.parent
         config_path = root_dir.joinpath(path or "bot/config.yaml")
 

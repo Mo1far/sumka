@@ -6,11 +6,13 @@ from bot.db.decorators import session_decorator
 from bot.db.models import Town
 from bot.enums import TownActionEnum
 from bot.filters.admin import IsSuperAdmin
-from bot.kb.admin import admin_kb, towns_callback, get_towns_admin_kb
+from bot.kb.admin import admin_kb, get_towns_admin_kb, towns_callback
 from bot.states.admin import TownsState
 
 
-@dp.callback_query_handler(IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.view.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.view.value)
+)
 @session_decorator(add_param=False)
 async def town_list(cq: types.CallbackQuery) -> None:
     towns_list = await Town.get_list()
@@ -18,12 +20,13 @@ async def town_list(cq: types.CallbackQuery) -> None:
     await cq.answer()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.create.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.create.value)
+)
 async def town_create_start(cq: types.CallbackQuery) -> None:
     await TownsState.create.set()
 
-    await cq.message.answer("Введіть назву міста \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть назву міста \n" "Для скасування - /cancel")
     await cq.answer("Введіть назву міста")
 
 
@@ -35,16 +38,19 @@ async def town_create(msg: types.Message, state: FSMContext):
     await msg.answer("Створено!")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.edit.value))
-async def town_edit_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+@dp.callback_query_handler(
+    IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.edit.value)
+)
+async def town_edit_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     await TownsState.edit.set()
 
     town_id = callback_data.get("town_id")
     async with state.proxy() as data:
         data["town_id"] = town_id
 
-    await cq.message.answer("Введіть нову назву \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть нову назву \n" "Для скасування - /cancel")
     await cq.answer("Введіть нову назву")
 
 
@@ -60,9 +66,13 @@ async def town_edit(msg: types.Message, state: FSMContext):
     await msg.answer("Відредаговано!")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.delete.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), towns_callback.filter(action=TownActionEnum.delete.value)
+)
 @session_decorator(add_param=False)
-async def town_delete_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+async def town_delete_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     town_id = int(callback_data["town_id"])
     town = await Town.get(None, id=town_id)
     await town.delete()

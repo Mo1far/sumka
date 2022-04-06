@@ -1,9 +1,4 @@
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    String, Text,
-)
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -13,7 +8,7 @@ class Town(Base):
     __tablename__ = "town"
 
     name = Column(String(100), nullable=False)
-    rating = Column(Integer, default=0)
+    rating = Column(Integer, server_default="0")
 
     user = relationship("User")
 
@@ -30,8 +25,8 @@ class Category(Base):
     __tablename__ = "category"
 
     name = Column(String(100), nullable=False)
-    description = Column(Text, default=False)
-    rating = Column(Integer, default=0)
+    description = Column(Text(4096), default=False)
+    rating = Column(Integer, server_default='0')
 
     town_id = Column(Integer, ForeignKey("town.id"))
     parent_category_id = Column(Integer, ForeignKey("category.id"))

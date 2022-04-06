@@ -10,3 +10,7 @@ revision:
 
 migrate:
 	poetry run python entry.py --migrate
+
+lint:
+	black entry.py bot
+	isort entry.py bot/ --profile=black

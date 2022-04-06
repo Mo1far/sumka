@@ -4,68 +4,100 @@ from sqlalchemy import or_
 
 from bot.core import dp
 from bot.db.decorators import session_decorator
-from bot.db.models import Town, Category
+from bot.db.models import Category, Town
 from bot.enums import CategoryActionEnum
 from bot.filters.admin import IsSuperAdmin
-from bot.kb.admin import category_callback, get_town_for_categories, get_categories_for_town, get_category_action_kb
+from bot.kb.admin import (
+    category_callback,
+    get_categories_for_town,
+    get_category_action_kb,
+    get_town_for_categories,
+)
 from bot.states.admin import CategoryState
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.view_towns.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.view_towns.value)
+)
 @session_decorator(add_param=False)
 async def category_towns_list(cq: types.CallbackQuery) -> None:
     towns = await Town.get_list()
-    await cq.message.answer("Список міст для категорій", reply_markup=get_town_for_categories(towns))
+    await cq.message.answer(
+        "Список міст для категорій", reply_markup=get_town_for_categories(towns)
+    )
     await cq.answer()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.view_by_town.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(),
+    category_callback.filter(action=CategoryActionEnum.view_by_town.value),
+)
 @session_decorator(add_param=False)
 async def category_by_town_list(cq: types.CallbackQuery, callback_data: dict) -> None:
     town_id = int(callback_data["town_id"])
     town = await Town.get(None, id=town_id)
-    categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id),
-                                         parent_category_id=None)
-    await cq.message.answer(f"Список категорій для {town.name}",
-                            reply_markup=get_categories_for_town(categories, town_id))
+    categories = await Category.get_list(
+        or_(Category.town_id == None, Category.town_id == town_id),
+        parent_category_id=None,
+    )
+    await cq.message.answer(
+        f"Список категорій для {town.name}",
+        reply_markup=get_categories_for_town(categories, town_id),
+    )
     await cq.answer()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.view_sub_category.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(),
+    category_callback.filter(action=CategoryActionEnum.view_sub_category.value),
+)
 @session_decorator(add_param=False)
-async def sub_category_by_town_list(cq: types.CallbackQuery, callback_data: dict) -> None:
+async def sub_category_by_town_list(
+    cq: types.CallbackQuery, callback_data: dict
+) -> None:
     town_id = int(callback_data["town_id"])
     parent_category = await Category.get(None, id=int(callback_data["category_id"]))
     town = await Town.get(None, id=town_id)
-    categories = await Category.get_list(or_(Category.town_id == town_id, Category.town_id == None),
-                                         parent_category_id=parent_category.id)
-    await cq.message.answer(f"Список підкатегорій для {town.name} {parent_category.name}",
-                            reply_markup=get_categories_for_town(categories, town_id, parent_category.id))
+    categories = await Category.get_list(
+        or_(Category.town_id == town_id, Category.town_id == None),
+        parent_category_id=parent_category.id,
+    )
+    await cq.message.answer(
+        f"Список підкатегорій для {town.name} {parent_category.name}",
+        reply_markup=get_categories_for_town(categories, town_id, parent_category.id),
+    )
     await cq.answer()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.create.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.create.value)
+)
 @session_decorator(add_param=False)
-async def create_category_by_town_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+async def create_category_by_town_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     await CategoryState.create_name.set()
     async with state.proxy() as data:
         data["town_id"] = int(callback_data["town_id"])
 
-    await cq.message.answer("Введіть назву категорії \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть назву категорії \n" "Для скасування - /cancel")
     await cq.answer("Введіть назву категорії")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.add_sub_category.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(),
+    category_callback.filter(action=CategoryActionEnum.add_sub_category.value),
+)
 @session_decorator(add_param=False)
-async def create_sub_category_by_town_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+async def create_sub_category_by_town_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     await CategoryState.create_name.set()
     async with state.proxy() as data:
         data["town_id"] = int(callback_data["town_id"])
         data["parent_category_id"] = int(callback_data["category_id"])
 
-    await cq.message.answer("Введіть назву категорії \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть назву категорії \n" "Для скасування - /cancel")
     await cq.answer("Введіть назву категорії")
 
 
@@ -90,36 +122,48 @@ async def create_category_desc_by_town(msg: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.detail.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.detail.value)
+)
 @session_decorator(add_param=False)
-async def detail_category_by_town_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+async def detail_category_by_town_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     category = await Category.get(None, id=int(callback_data["category_id"]))
     town_id = int(callback_data["town_id"])
 
-    await cq.message.answer(f"Назва - {category.name} \n\n"
-                            f"Опис - {category.description}",
-                            reply_markup=get_category_action_kb(category, town_id=town_id))
+    await cq.message.answer(
+        f"Назва - {category.name[:2000]} \n\n" f"Опис - {category.description[:2000]}",
+        reply_markup=get_category_action_kb(category, town_id=town_id),
+    )
     await cq.answer()
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.delete.value))
+@dp.callback_query_handler(
+    IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.delete.value)
+)
 @session_decorator(add_param=False)
-async def category_delete_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+async def category_delete_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     category = await Category.get(None, id=int(callback_data["category_id"]))
     await category.delete()
 
     await cq.answer("Видалено!")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.edit_name.value))
-async def category_edit_name_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+@dp.callback_query_handler(
+    IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.edit_name.value)
+)
+async def category_edit_name_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     await CategoryState.edit_name.set()
 
     async with state.proxy() as data:
         data["id"] = int(callback_data["category_id"])
 
-    await cq.message.answer("Введіть нову назву \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть нову назву \n" "Для скасування - /cancel")
     await cq.answer("Введіть нову назву")
 
 
@@ -134,15 +178,19 @@ async def category_edit_name(msg: types.Message, state: FSMContext):
     await msg.answer("Відредаговано!")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.edit_description.value))
-async def category_edit_description_btn(cq: types.CallbackQuery, callback_data: dict, state: FSMContext) -> None:
+@dp.callback_query_handler(
+    IsSuperAdmin(),
+    category_callback.filter(action=CategoryActionEnum.edit_description.value),
+)
+async def category_edit_description_btn(
+    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+) -> None:
     await CategoryState.edit_description.set()
 
     async with state.proxy() as data:
         data["id"] = int(callback_data["category_id"])
 
-    await cq.message.answer("Введіть новий опис \n"
-                            "Для скасування - /cancel")
+    await cq.message.answer("Введіть новий опис \n" "Для скасування - /cancel")
     await cq.answer("Введіть новий опис")
 
 
@@ -157,13 +205,23 @@ async def category_edit_description(msg: types.Message, state: FSMContext):
     await msg.answer("Відредаговано!")
 
 
-@dp.callback_query_handler(IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.make_global.value))
-async def category_edit_description_btn(cq: types.CallbackQuery, callback_data: dict) -> None:
+@dp.callback_query_handler(
+    IsSuperAdmin(),
+    category_callback.filter(action=CategoryActionEnum.make_global.value),
+)
+@session_decorator(add_param=False)
+async def category_make_global(
+    cq: types.CallbackQuery, callback_data: dict
+) -> None:
     category: Category = await Category.get(None, id=int(callback_data["category_id"]))
-    parent_category: Category = await Category.get(None, parent_category_id=category.parent_category_id)
+    parent_category: Category = await Category.get(
+        None, parent_category_id=category.parent_category_id
+    )
 
     if parent_category.town_id is not None:
-        return await cq.answer("Ця категорія не може бути глобальною, оскільки батьківська прив'язана до міста")
+        return await cq.answer(
+            "Ця категорія не може бути глобальною, оскільки батьківська прив'язана до міста"
+        )
 
     await category.update(town_id=None)
     await cq.answer("Відредаговано")

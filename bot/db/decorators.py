@@ -3,7 +3,9 @@ import functools
 from .base import Session, session_context
 
 
-def session_decorator(db_session=Session, expire_on_commit: bool = False, add_param: bool = False):
+def session_decorator(
+    db_session=Session, expire_on_commit: bool = False, add_param: bool = False
+):
     """
     Decorator with parameter for async session usage.
 

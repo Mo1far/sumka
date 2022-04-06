@@ -6,7 +6,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from bot.db.models import Base, Town
+from bot.db.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,7 +21,6 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -48,6 +47,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         compare_type=True,
+        compare_server_default=True
     )
 
     with context.begin_transaction():
@@ -56,7 +56,7 @@ def run_migrations_offline():
 
 def do_run_migrations(connection):
     context.configure(
-        connection=connection, target_metadata=target_metadata, compare_type=True
+        connection=connection, target_metadata=target_metadata, compare_type=True, compare_server_default=True
     )
 
     with context.begin_transaction():

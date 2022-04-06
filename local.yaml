@@ -1,3 +1,8 @@
-bot_token: "5278925573:AAGsXdhvBQf5NVdiCe927Pk8aSOgG6hEMFo"
+bot_token: "1142446947:AAHAbEq49jLAy2d1ByTLXBoLzLlGvqLoWR0"
 admins: [213447542]
 database_uri: postgresql+asyncpg://postgres:postgres@localhost:5432/sumka
+redis_host: localhost
+redis_port: 6379
+redis_db: 0
+redis_password: None
+redis_prefix: bot_fsm

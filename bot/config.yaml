@@ -1,3 +1,8 @@
 bot_token: ""
 admins: [ ]
 database_uri: postgresql+asyncpg://postgres:postgres@localhost:5432/sumka
+redis_host: localhost
+redis_port: 6379
+redis_db: 0
+redis_password: None
+redis_prefix: bot_fsm

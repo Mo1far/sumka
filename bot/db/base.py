@@ -2,7 +2,7 @@ import contextvars
 import json
 from typing import Any, Dict, Iterator, Optional, Tuple, Union
 
-from sqlalchemy import Column, Integer, MetaData, inspect, select, BigInteger
+from sqlalchemy import BigInteger, Column, Integer, MetaData, inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -58,7 +58,7 @@ class Base(Model):
 
     @classmethod
     async def get_or_create(
-            cls, defaults: Optional[dict] = None, **kwargs
+        cls, defaults: Optional[dict] = None, **kwargs
     ) -> Tuple[Model, bool]:
         if obj := await cls.get(None, None, **kwargs):
             return obj, False

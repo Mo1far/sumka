@@ -56,6 +56,11 @@ async def on_startup(dp: Dispatcher):
     await db_connect(config["database_uri"])
 
 
+async def on_shutdown(dp: Dispatcher) -> None:
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+
+
 if args.run:
     dp = create_dp(config)
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
