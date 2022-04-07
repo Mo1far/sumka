@@ -1,10 +1,10 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, BigInteger
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from .base import Base, UpdatedMixin, CreatedMixin
 
 
-class Town(Base):
+class Town(Base, CreatedMixin, UpdatedMixin):
     __tablename__ = "town"
 
     name = Column(String(100), nullable=False)
@@ -13,7 +13,7 @@ class Town(Base):
     user = relationship("User")
 
 
-class User(Base):
+class User(Base, CreatedMixin, UpdatedMixin):
     __tablename__ = "user"
 
     name = Column(String(100), nullable=True)
@@ -21,12 +21,20 @@ class User(Base):
     town_id = Column(Integer, ForeignKey("town.id"))
 
 
-class Category(Base):
+class Category(Base, CreatedMixin, UpdatedMixin):
     __tablename__ = "category"
 
     name = Column(String(100), nullable=False)
-    description = Column(Text(4096), default=False)
+    description = Column(Text(), default=False)
     rating = Column(Integer, server_default='0')
 
     town_id = Column(Integer, ForeignKey("town.id"))
     parent_category_id = Column(Integer, ForeignKey("category.id"))
+
+
+class MessageLog(Base, CreatedMixin, UpdatedMixin):
+    __tablename__ = "message_log"
+
+    text = Column(Text())
+    user_id = Column(BigInteger)
+    user_town_id = Column(Integer)

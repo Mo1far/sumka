@@ -2,7 +2,7 @@ import contextvars
 import json
 from typing import Any, Dict, Iterator, Optional, Tuple, Union
 
-from sqlalchemy import BigInteger, Column, Integer, MetaData, inspect, select
+from sqlalchemy import BigInteger, Column, MetaData, inspect, select, DateTime, func
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -58,7 +58,7 @@ class Base(Model):
 
     @classmethod
     async def get_or_create(
-        cls, defaults: Optional[dict] = None, **kwargs
+            cls, defaults: Optional[dict] = None, **kwargs
     ) -> Tuple[Model, bool]:
         if obj := await cls.get(None, None, **kwargs):
             return obj, False
@@ -132,3 +132,15 @@ class Base(Model):
 
         query = select([1]).select_from(cls).filter_by(**kwargs).exists().select()
         return bool((await current_session.execute(query)).scalars().one())
+
+
+class CreatedMixin(Model):
+    __abstract__ = True
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UpdatedMixin(Model):
+    __abstract__ = True
+
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

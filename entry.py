@@ -49,6 +49,19 @@ if args.revision:
     logger.info("Create database migration")
     sys.exit(0)
 
+if args.downgrade:
+    from alembic import command
+    from alembic.config import Config
+
+    alembic_cfg = Config("alembic.ini")
+    revision = input("Downgrade revision (-1 for previous, Enter to skip): ")
+    if revision:
+        logger.info(f"Downgrade database to revision {revision}")
+        command.downgrade(alembic_cfg, revision)
+    else:
+        logger.info("Downgrade skipped.")
+    sys.exit(0)
+
 
 async def on_startup(dp: Dispatcher):
     from bot import handlers  # noqa

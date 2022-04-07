@@ -6,7 +6,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from bot.core import dp
 from bot.db.decorators import session_decorator
-from bot.db.models import Category, User
+from bot.db.models import Category, User, MessageLog
 from bot.kb.user import get_main_user_menu
 
 
@@ -23,6 +23,10 @@ def get_category_list_menu(categories):
 @session_decorator()
 async def menu(msg: types.Message, state: FSMContext):
     user = await User.get(msg.from_user.id)
+    await MessageLog.create(text=msg.text,
+                            user_id=user.id,
+                            user_town_id=user.town_id)
+
     if msg.text == "↩ Назад":
         data = await state.get_data()
         if previous_category_id := data.get("previous_category_id"):
