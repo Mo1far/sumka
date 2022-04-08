@@ -3,6 +3,7 @@ from operator import or_
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from sqlalchemy import select
 
 from bot.core import dp
 from bot.db.decorators import session_decorator
@@ -20,8 +21,8 @@ def get_category_list_menu(categories):
 
 
 @dp.message_handler()
-@session_decorator()
-async def menu(msg: types.Message, state: FSMContext):
+@session_decorator(add_param=True)
+async def menu(current_session, msg: types.Message, state: FSMContext):
     user = await User.get(msg.from_user.id)
     await MessageLog.create(text=msg.text,
                             user_id=user.id,
@@ -52,10 +53,14 @@ async def menu(msg: types.Message, state: FSMContext):
             "Не можу вас зрозуміти", reply_markup=await get_main_user_menu(user.town_id)
         )
 
-    sub_categories = await Category.get_list(
-        or_(Category.town_id == None, Category.town_id == user.town_id),
-        parent_category_id=category.id,
+    query = (
+        select(Category)
+            .filter_by(parent_category_id=category.id)
+            .filter(or_(Category.town_id == None, Category.town_id == user.town_id))
+            .order_by(Category.rating.desc(), Category.id)
     )
+    sub_categories = (await current_session.execute(query)).scalars().all()
+
     if not sub_categories:
         if parent_category := await Category.get(None, id=category.parent_category_id):
             await state.set_data(

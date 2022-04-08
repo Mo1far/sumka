@@ -21,8 +21,6 @@ async def get_main_user_menu(current_session, town_id):
     )
     main_categories = (await current_session.execute(query)).scalars().all()
 
-    # main_categories = await Category.get_list(or_(Category.town_id == None, Category.town_id == town_id),
-    #                                           parent_category_id=None)
     for category in main_categories:
         main_user_menu.insert(category.name)
     main_user_menu.insert(KeyboardButton("⚙ Змінити місце проживання"))
