@@ -1,7 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, BigInteger
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from .base import Base, UpdatedMixin, CreatedMixin
+from .base import Base, CreatedMixin, UpdatedMixin
 
 
 class Town(Base, CreatedMixin, UpdatedMixin):
@@ -26,7 +26,7 @@ class Category(Base, CreatedMixin, UpdatedMixin):
 
     name = Column(String(100), nullable=False)
     description = Column(Text(), default=False)
-    rating = Column(Integer, server_default='0')
+    rating = Column(Integer, server_default="0")
 
     town_id = Column(Integer, ForeignKey("town.id"))
     parent_category_id = Column(Integer, ForeignKey("category.id"))

@@ -76,4 +76,6 @@ async def on_shutdown(dp: Dispatcher) -> None:
 
 if args.run:
     dp = create_dp(config)
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
+    executor.start_polling(
+        dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown
+    )

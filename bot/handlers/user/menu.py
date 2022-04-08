@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from bot.core import dp
 from bot.db.decorators import session_decorator
-from bot.db.models import Category, User, MessageLog
+from bot.db.models import Category, MessageLog, User
 from bot.kb.user import get_main_user_menu
 
 
@@ -24,9 +24,7 @@ def get_category_list_menu(categories):
 @session_decorator(add_param=True)
 async def menu(current_session, msg: types.Message, state: FSMContext):
     user = await User.get(msg.from_user.id)
-    await MessageLog.create(text=msg.text,
-                            user_id=user.id,
-                            user_town_id=user.town_id)
+    await MessageLog.create(text=msg.text, user_id=user.id, user_town_id=user.town_id)
 
     if msg.text == "↩ Назад":
         data = await state.get_data()
@@ -55,9 +53,9 @@ async def menu(current_session, msg: types.Message, state: FSMContext):
 
     query = (
         select(Category)
-            .filter_by(parent_category_id=category.id)
-            .filter(or_(Category.town_id == None, Category.town_id == user.town_id))
-            .order_by(Category.rating.desc(), Category.id)
+        .filter_by(parent_category_id=category.id)
+        .filter(or_(Category.town_id == None, Category.town_id == user.town_id))
+        .order_by(Category.rating.desc(), Category.id)
     )
     sub_categories = (await current_session.execute(query)).scalars().all()
 

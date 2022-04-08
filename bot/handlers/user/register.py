@@ -45,6 +45,7 @@ async def start(current_session, msg: types.Message, state: FSMContext):
         await msg.answer(
             "Ласкаво просимо", reply_markup=await get_main_user_menu(user.town_id)
         )
+        await state.finish()
     else:
         await User.create(
             id=msg.from_user.id,
@@ -66,7 +67,6 @@ async def change_user_town(current_session, msg: types.Message, state: FSMContex
     query = select(Town).order_by(Town.rating.desc(), Town.id)
     towns = (await current_session.execute(query)).scalars().all()
 
-    # towns = await Town.get_list()
     await UserRegisterState.wait_town.set()
     await msg.answer(
         "Оберіть ваше місце проживання", reply_markup=get_towns_list(towns)
@@ -74,13 +74,16 @@ async def change_user_town(current_session, msg: types.Message, state: FSMContex
 
 
 @dp.message_handler(state=UserRegisterState.wait_town)
-@session_decorator(add_param=False)
-async def assign_user_to_town(msg: types.Message, state: FSMContext):
+@session_decorator(add_param=True)
+async def assign_user_to_town(current_session, msg: types.Message, state: FSMContext):
     user = await User.get(None, id=msg.from_user.id)
     town = await Town.get(None, name=msg.text)
     if not town:
+        query = select(Town).order_by(Town.rating.desc(), Town.id)
+        towns = (await current_session.execute(query)).scalars().all()
         return await msg.answer(
-            "Нажаль цього міста нема в переліку, спробуйте обрати місто на клавіатурі внизу ще раз"
+            "Нажаль цього міста нема в переліку, спробуйте обрати місто на клавіатурі внизу ще раз",
+            reply_markup=get_towns_list(towns),
         )
     await user.update(town_id=town.id)
     await msg.answer(success_msg, reply_markup=(await get_main_user_menu(town.id)))

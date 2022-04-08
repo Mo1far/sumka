@@ -210,9 +210,7 @@ async def category_edit_description(msg: types.Message, state: FSMContext):
     category_callback.filter(action=CategoryActionEnum.make_global.value),
 )
 @session_decorator(add_param=False)
-async def category_make_global(
-    cq: types.CallbackQuery, callback_data: dict
-) -> None:
+async def category_make_global(cq: types.CallbackQuery, callback_data: dict) -> None:
     category: Category = await Category.get(None, id=int(callback_data["category_id"]))
     parent_category: Category = await Category.get(
         None, parent_category_id=category.parent_category_id
