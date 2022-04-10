@@ -53,7 +53,7 @@ async def category_by_town_list(cq: types.CallbackQuery, callback_data: dict) ->
 )
 @session_decorator(add_param=False)
 async def sub_category_by_town_list(
-    cq: types.CallbackQuery, callback_data: dict
+        cq: types.CallbackQuery, callback_data: dict
 ) -> None:
     town_id = int(callback_data["town_id"])
     parent_category = await Category.get(None, id=int(callback_data["category_id"]))
@@ -74,7 +74,7 @@ async def sub_category_by_town_list(
 )
 @session_decorator(add_param=False)
 async def create_category_by_town_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     await CategoryState.create_name.set()
     async with state.proxy() as data:
@@ -90,7 +90,7 @@ async def create_category_by_town_btn(
 )
 @session_decorator(add_param=False)
 async def create_sub_category_by_town_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     await CategoryState.create_name.set()
     async with state.proxy() as data:
@@ -127,13 +127,13 @@ async def create_category_desc_by_town(msg: types.Message, state: FSMContext):
 )
 @session_decorator(add_param=False)
 async def detail_category_by_town_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     category = await Category.get(None, id=int(callback_data["category_id"]))
     town_id = int(callback_data["town_id"])
 
     await cq.message.answer(
-        f"Назва - {category.name[:2000]} \n\n" f"Опис - {category.description[:2000]}",
+        f"Назва - {category.name[:2000]} \n\n" f"Опис - {category.description[:2000] if category.description else '-'}",
         reply_markup=get_category_action_kb(category, town_id=town_id),
     )
     await cq.answer()
@@ -144,7 +144,7 @@ async def detail_category_by_town_btn(
 )
 @session_decorator(add_param=False)
 async def category_delete_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     category = await Category.get(None, id=int(callback_data["category_id"]))
     await category.delete()
@@ -156,7 +156,7 @@ async def category_delete_btn(
     IsSuperAdmin(), category_callback.filter(action=CategoryActionEnum.edit_name.value)
 )
 async def category_edit_name_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     await CategoryState.edit_name.set()
 
@@ -183,7 +183,7 @@ async def category_edit_name(msg: types.Message, state: FSMContext):
     category_callback.filter(action=CategoryActionEnum.edit_description.value),
 )
 async def category_edit_description_btn(
-    cq: types.CallbackQuery, callback_data: dict, state: FSMContext
+        cq: types.CallbackQuery, callback_data: dict, state: FSMContext
 ) -> None:
     await CategoryState.edit_description.set()
 
