@@ -106,7 +106,7 @@ async def create_sub_category_by_town_btn(
 async def create_category_name_by_town(msg: types.Message, state: FSMContext):
     duplicate = await Category.get(None, name=msg.text)
     if duplicate:
-        await msg.answer("Ця назва вже використовуючи, спробуйте іншу!")
+        return await msg.answer("Ця назва вже використовуючи, спробуйте іншу!")
 
     async with state.proxy() as data:
         data["name"] = msg.text
@@ -217,7 +217,7 @@ async def category_edit_description(msg: types.Message, state: FSMContext):
 async def category_make_global(cq: types.CallbackQuery, callback_data: dict) -> None:
     category: Category = await Category.get(None, id=int(callback_data["category_id"]))
     parent_category: Category = await Category.get(
-        None, parent_category_id=category.parent_category_id
+        None, id=category.parent_category_id
     )
 
     if parent_category.town_id is not None:
