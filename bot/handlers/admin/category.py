@@ -104,6 +104,10 @@ async def create_sub_category_by_town_btn(
 @dp.message_handler(IsSuperAdmin(), state=CategoryState.create_name)
 @session_decorator(add_param=False)
 async def create_category_name_by_town(msg: types.Message, state: FSMContext):
+    duplicate = await Category.get(None, name=msg.text)
+    if duplicate:
+        await msg.answer("Ця назва вже використовуючи, спробуйте іншу!")
+
     async with state.proxy() as data:
         data["name"] = msg.text
 
